@@ -1,6 +1,5 @@
 # lesson8
-
-Image.asset('assets/images/ezgif.com-video-to-gif.gif')
+![Демо](ezgif.com-video-to-gif.gif)
 
 ## Getting Started
 
