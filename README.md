@@ -1,6 +1,6 @@
 # lesson8
 
-A new Flutter project.
+Image.asset('assets/images/ezgif.com-video-to-gif.gif')
 
 ## Getting Started
 
