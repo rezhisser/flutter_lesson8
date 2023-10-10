@@ -40,7 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     manager.initializeDefaultRecipes();
-
   }
 
   bool _showListView = true;
@@ -76,73 +75,105 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-              child: _showListView
-                  ? _buildListView(manager)
-                  : _buildGridView(manager)),
+            child: _showListView
+                ? RecipeListView(
+                    recipes: manager.recipes,
+                    onDelete: (id) => manager.deleteRecipeById(id),
+                  )
+                : RecipeGridView(
+                    recipes: manager.recipes,
+                    onTap: (recipe) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RecipeDetailPage(recipe: recipe),
+                        ),
+                      );
+                    },
+                  ),
+          ),
         ],
       ),
     );
   }
 }
 
-ListView _buildListView(RecipeManager manager) {
-  return ListView.builder(
-    itemCount: manager.recipes.length,
-    itemBuilder: (context, index) {
-      final item = manager.recipes[index];
-      return Dismissible(
-        key: ValueKey(item.id),
-        background: Container(
-          color: Colors.red,
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(left: 20),
-          child: Icon(Icons.delete, color: Colors.white),
-        ),
-        // Фон під ListTile при свайпі
-        direction: DismissDirection.startToEnd,
-        // Свайп тільки зліва направо
-        onDismissed: (direction) {
-          manager.deleteRecipeById(item.id); // Видаляємо рецепт за ID
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Рецепт ${item.name} видалено")),
-          );
-        },
-        child: ListTile(
-          leading: Image.file(File(item.imgUrl)), // Зображення з URL
-          title: Text(item.name),
-          subtitle: Text(item.cookingTime),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RecipeDetailPage(recipe: item),
-              ),
+class RecipeListView extends StatelessWidget {
+  final List<Recipe> recipes;
+  final Function(int) onDelete;
+
+  RecipeListView({required this.recipes, required this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: recipes.length,
+      itemBuilder: (context, index) {
+        final item = recipes[index];
+        return Dismissible(
+          key: ValueKey(item.id),
+          background: Container(
+            color: Colors.red,
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(left: 20),
+            child: Icon(Icons.delete, color: Colors.white),
+          ),
+          direction: DismissDirection.startToEnd,
+          onDismissed: (direction) {
+            onDelete(item.id);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Рецепт ${item.name} видалено")),
             );
           },
-        ),
-      );
-    },
-  );
+          child: ListTile(
+            leading: Image.file(File(item.imgUrl)),
+            title: Text(item.name),
+            subtitle: Text(item.cookingTime),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RecipeDetailPage(recipe: item),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 }
 
-GridView _buildGridView(RecipeManager manager) {
-  return GridView.builder(
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      childAspectRatio: 2 / 3,
-    ),
-    itemBuilder: (context, index) {
-      return Card(
-        child: Column(
-          children: [
-            Image.file(File(manager.recipes[index].imgUrl)),
-            // Expanded(child: Image.file(File(manager.recipes[index].imgUrl), height: 180, width: 180,)),
-            Text(manager.recipes[index].name),
-            Text(manager.recipes[index].cookingTime),
-          ],
-        ),
-      );
-    },
-    itemCount: manager.recipes.length,
-  );
+class RecipeGridView extends StatelessWidget {
+  final List<Recipe> recipes;
+  final void Function(Recipe) onTap;
+
+  RecipeGridView({required this.recipes, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2 / 3,
+      ),
+      itemBuilder: (context, index) {
+        final recipe = recipes[index];
+        return GestureDetector(
+          onTap: () => onTap(recipe),
+          child: Card(
+            child: Column(
+              children: [
+                Image.file(File(recipe.imgUrl)),
+                Text(recipe.name),
+                Text(recipe.cookingTime),
+              ],
+            ),
+          ),
+        );
+      },
+      itemCount: recipes.length,
+    );
+  }
 }
