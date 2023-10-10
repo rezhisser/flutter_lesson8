@@ -12,7 +12,7 @@ class PermissionPage extends StatelessWidget {
       //backgroundColor: Colors.blue,
       appBar: AppBar(
           backgroundColor: Colors.white,
-          title: const Text('HUMAN Школа'),
+          title: const Text('Рецепти'),
           elevation: 3, // Встановіть значення елевації, яке вам потрібно
           shadowColor: Colors.blueGrey
       ),

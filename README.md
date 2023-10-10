@@ -1,5 +1,5 @@
 # lesson8
-![Демо](ezgif.com-video-to-gif.gif)
+![Демо](demo.gif)
 
 ## Getting Started
 
